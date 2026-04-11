@@ -1,0 +1,60 @@
+= Rapport SAÉ 2.01-2.02, ressource Graphes
+Équipe B5
+
+== 1. Version 1 : Un seul moyen de transport
+
+=== 1.1 Exemple
+
+Nous utilisons un réseau de transport entre 5 villes (A, B, C, D, E) utilisant les trois modes de transport suivant: Train, Avion, Bus.
+
+.Tableau des connexions inter-villes
+[options="header"]
+|===
+| type ligne | villes reliées | durée (min) | émissions (kg CO2e) | prix (€)
+| avion | A, C | 135 | 120 | 110
+| train | A, C | 60 | 3 | 40
+| train | A, D | 120 | 8 | 60
+| train | A, E | 60 | 4 | 30
+| train | C, D | 90 | 4 | 70
+| train | D, E | 75 | 5 | 35
+| bus | A, B | 40 | 6 | 10
+| bus | A, E | 100 | 15 | 20
+| bus | B, C | 130 | 20 | 25
+| bus | B, E | 80 | 12 | 15
+| bus | C, D | 65 | 10 | 15
+| bus | D, E | 60 | 9 | 12
+|===
+
+*Scénario Version 1 :*
+
+* **Moyen de transport choisi :** Train
+* **Critère d'optimisation :** Temps (Durée)
+* **Ville de départ :** A
+* **Ville d'arrivée :** D
+
+*Les meilleurs itinéraires (Train uniquement, optimisation Temps) :*
+
+1. [A, D] - Durée : 120 min
+2. [A, E, D] - Durée : 60 + 75 = 135 min
+3. [A, C, D] - Durée : 60 + 90 = 150 min
+
+=== 1.2 Modèle pour l'exemple
+
+Voici le graphe modélisant le scénario ci-dessus.
+
+image::Graphe_Train.svg[Graphe Version 1 - Train, width=600]
+
+Les meilleurs itinéraires sous forme de chemins dans ce graphe sont:
+
+* Chemin 1 : [A, D]
+* Chemin 2 : [A, E], [E, D]
+* Chemin 3 : [A, C], [C, D]
+
+=== 1.3 Modélisation pour la Version 1 dans le cas général
+
+Pour un problème de recherche d'itinéraire abstrait, voici comment nous définissons le modèle :
+
+* **Type de graphe :** Pour la Version 1, puisqu'un seul moyen de transport est choisi, nous filtrons les données pour obtenir un graphe simple, non-orienté et valué. Il n'est pas nécessaire d'utiliser un multigraphe ici car on exclut les autres moyens de transport.
+* **Sommets du graphe :** L'ensemble des gares, arrêts de bus ou aéroports (selon le moyen de transport choisi) présents dans les villes.
+* **Arêtes et poids :** Il existe une arête dirigée du sommet x au sommet y s'il existe une connexion directe avec le moyen de transport choisi entre ces deux infrastructures. Le poids de l'arête correspond à la valeur du critère d'optimisation (durée, émissions ou prix) de cette connexion.
+* **Algorithme :** Nous utilisons l'algorithme des "k plus courts chemins" (kpcc). Ses arguments sont: le graphe généré G, le sommet de départ, le sommet d'arrivée, et le nombre k (ici k=4) d'itinéraires demandés.
