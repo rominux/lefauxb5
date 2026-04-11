@@ -61,6 +61,72 @@ Pour un problème de recherche d'itinéraire abstrait, voici comment nous défin
 
 === 1.4 Prototype pour la Version 1
 
-Le code source de la classe exécutable `Graphes_V1` est disponible sur notre dépôt GitLab.
+Le code source de la classe exécutable `GraphesV1` est disponible sur notre dépôt GitLab.
+
+* **Lien du commit :** `https://gitlab.univ-lille.fr/sae2.01-2.02/2026/B5/-/commit/b23a0910bdf91346b3b432b1e4f4a0d2264085a5`
+
+== 2. Version 2 : Plusieurs moyens de transport
+
+=== 2.1 Exemple
+
+Nous réutilisons l'exemple précédent avec l'ensemble des moyens de transport disponibles (Train, Avion, Bus).
+
+.Tableau des correspondances intra-villes
+[options="header"]
+|===
+| type ligne | villes reliées | durée (min) | émissions (kg CO2e) | prix (€)
+| avion | A, C | 135 | 120 | 110
+| train | A, C | 60 | 3 | 40
+| train | A, D | 120 | 8 | 60
+| train | A, E | 60 | 4 | 30
+| train | C, D | 90 | 4 | 70
+| train | D, E | 75 | 5 | 35
+| bus | A, B | 40 | 6 | 10
+| bus | A, E | 100 | 15 | 20
+| bus | B, C | 130 | 20 | 25
+| bus | B, E | 80 | 12 | 15
+| bus | C, D | 65 | 10 | 15
+| bus | D, E | 60 | 9 | 12
+|===
+
+*Note : Dans le cadre d'une optimisation par le prix, nous considérons que les transferts à pied ont un coût de 0 €.*
+
+*Scénario Version 2 :*
+
+* **Critère d'optimisation :** Prix (Coût en euros)
+* **Ville de départ :** D
+* **Ville d'arrivée :** A
+
+*Les 4 meilleurs itinéraires (Optimisation Prix) :*
+
+1. [Bus uniquement] D_ArretBus -> E_ArretBus -> A_ArretBus
+   - Prix : 12 + 20 = 32 €
+2. [Mixte Bus+Train] D_ArretBus -> E_ArretBus -> (Correspondance) -> E_Gare -> A_Gare
+   - Prix : 12 + 0 + 30 = 42 €
+3. [Bus uniquement] D_ArretBus -> C_ArretBus -> B_ArretBus -> A_ArretBus
+   - Prix : 15 + 25 + 10 = 50 €
+4. [Mixte Train+Bus] D_Gare -> E_Gare -> (Correspondance) -> E_ArretBus -> A_ArretBus
+   - Prix : 35 + 0 + 20 = 55 €
+
+=== 2.2 Modèle pour l'exemple
+
+Voici le graphe complet modélisant le réseau avec tous les moyens de transport et les correspondances intra-villes.
+
+image::Graphe.svg[Graphe Complet Version 2, width=600]
+
+=== 2.3 Modélisation pour la Version 2 dans le cas général
+
+Pour prendre en compte plusieurs modes de transport et leurs correspondances, le modèle évolue :
+
+* **Type de graphe :** La situation réelle s'apparente à un multigraphe à arêtes typées. Cependant, notre astuce de modélisation consiste à représenter chaque infrastructure (gare, aéroport, arrêt de bus) comme un sommet distinct. Cela nous permet d'obtenir un graphe simple, non-orienté et valué.
+* **Sommets du graphe :** L'ensemble de toutes les infrastructures de toutes les villes (par exemple, A_Gare, A_Aeroport, etc.).
+* **Arêtes et poids :** Il existe deux catégories d'arêtes :
+  ** *Les connexions inter-villes :* Relient des infrastructures de même type entre deux villes (ex: D_Gare vers E_Gare). Le poids est le prix en euros de la connexion.
+  ** *Les correspondances intra-villes :* Relient des infrastructures différentes au sein d'une même ville (ex: E_ArretBus vers E_Gare). Puisque notre critère est le prix, le poids de ces arêtes est de 0 €.
+* **Algorithme :** Nous utilisons l'algorithme des k plus courts chemins (kpcc) avec k=4. L'algorithme traverse les arêtes de correspondance exactement comme les arêtes de trajet, calculant ainsi le coût total du voyage.
+
+=== 2.4 Prototype pour la Version 2
+
+Le code source de la classe exécutable `GraphesV2` est disponible sur notre dépôt GitLab.
 
 * **Lien du commit :**
