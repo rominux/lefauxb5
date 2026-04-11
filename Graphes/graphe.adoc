@@ -63,7 +63,20 @@ Pour un problème de recherche d'itinéraire abstrait, voici comment nous défin
 
 Le code source de la classe exécutable `GraphesV1` est disponible sur notre dépôt GitLab.
 
+[source,java]
+----
+RÉSULTATS VERSION 1 : RECHERCHE D'ITINÉRAIRES (TRAIN UNIQUEMENT)
+Recherche des meilleurs chemins de A_Gare à D_Gare :
+
+1) Itinéraire : A_Gare -> D_Gare | Durée totale : 120 minutes
+2) Itinéraire : A_Gare -> E_Gare -> D_Gare | Durée totale : 135 minutes
+3) Itinéraire : A_Gare -> C_Gare -> D_Gare | Durée totale : 150 minutes
+----
+
 * **Lien du commit :** `https://gitlab.univ-lille.fr/sae2.01-2.02/2026/B5/-/commit/b23a0910bdf91346b3b432b1e4f4a0d2264085a5`
+
+
+
 
 == 2. Version 2 : Plusieurs moyens de transport
 
@@ -128,5 +141,17 @@ Pour prendre en compte plusieurs modes de transport et leurs correspondances, le
 === 2.4 Prototype pour la Version 2
 
 Le code source de la classe exécutable `GraphesV2` est disponible sur notre dépôt GitLab.
+
+[source,java]
+----
+RÉSULTATS VERSION 2 : RECHERCHE MULTIMODALE
+Critère d'optimisation : PRIX le moins cher
+Recherche des meilleurs chemins de D_ArretBus à A_ArretBus :
+
+1) Itinéraire : D_ArretBus -> E_ArretBus -> A_ArretBus | Prix total : 32 €
+2) Itinéraire : D_ArretBus -> E_ArretBus -> B_ArretBus -> A_ArretBus | Prix total : 37 €
+3) Itinéraire : D_ArretBus -> E_ArretBus -> E_Gare -> A_Gare -> A_ArretBus | Prix total : 42 €
+4) Itinéraire : D_ArretBus -> C_ArretBus -> B_ArretBus -> A_ArretBus | Prix total : 50 €
+----
 
 * **Lien du commit :**
