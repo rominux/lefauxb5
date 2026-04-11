@@ -58,3 +58,9 @@ Pour un problème de recherche d'itinéraire abstrait, voici comment nous défin
 * **Sommets du graphe :** L'ensemble des gares, arrêts de bus ou aéroports (selon le moyen de transport choisi) présents dans les villes.
 * **Arêtes et poids :** Il existe une arête dirigée du sommet x au sommet y s'il existe une connexion directe avec le moyen de transport choisi entre ces deux infrastructures. Le poids de l'arête correspond à la valeur du critère d'optimisation (durée, émissions ou prix) de cette connexion.
 * **Algorithme :** Nous utilisons l'algorithme des "k plus courts chemins" (kpcc). Ses arguments sont: le graphe généré G, le sommet de départ, le sommet d'arrivée, et le nombre k (ici k=4) d'itinéraires demandés.
+
+=== 1.4 Prototype pour la Version 1
+
+Le code source de la classe exécutable `Graphes_V1` est disponible sur notre dépôt GitLab.
+
+* **Lien du commit :**
