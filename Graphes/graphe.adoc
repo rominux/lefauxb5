@@ -54,7 +54,7 @@ Les meilleurs itinéraires sous forme de chemins dans ce graphe sont:
 
 Pour un problème de recherche d'itinéraire abstrait, voici comment nous définissons le modèle :
 
-* **Type de graphe :** Pour la Version 1, puisqu'un seul moyen de transport est choisi, nous filtrons les données pour obtenir un graphe simple, non-orienté et valué. Il n'est pas nécessaire d'utiliser un multigraphe ici car on exclut les autres moyens de transport.
+* **Type de graphe :** Conceptuellement, le réseau physique est non-orienté puisque les moyens de transport circulent dans les deux sens. Cependant, la librairie Java fournie pour ce projet imposant l'utilisation de graphes orientés, nous modélisons chaque tronçon physique par deux arêtes orientées (une pour l'aller, une pour le retour). Pour la Version 1, nous filtrons les données pour obtenir un graphe simple, orienté et valué.
 * **Sommets du graphe :** L'ensemble des gares, arrêts de bus ou aéroports (selon le moyen de transport choisi) présents dans les villes.
 * **Arêtes et poids :** Il existe une arête dirigée du sommet x au sommet y s'il existe une connexion directe avec le moyen de transport choisi entre ces deux infrastructures. Le poids de l'arête correspond à la valeur du critère d'optimisation (durée, émissions ou prix) de cette connexion.
 * **Algorithme :** Nous utilisons l'algorithme des "k plus courts chemins" (kpcc). Ses arguments sont: le graphe généré G, le sommet de départ, le sommet d'arrivée, et le nombre k (ici k=4) d'itinéraires demandés.
@@ -76,8 +76,6 @@ Recherche des meilleurs chemins de A_Gare à D_Gare :
 * **Lien du commit :** `https://gitlab.univ-lille.fr/sae2.01-2.02/2026/B5/-/commit/b23a0910bdf91346b3b432b1e4f4a0d2264085a5`
 
 
-
-
 == 2. Version 2 : Plusieurs moyens de transport
 
 === 2.1 Exemple
@@ -87,19 +85,13 @@ Nous réutilisons l'exemple précédent avec l'ensemble des moyens de transport 
 .Tableau des correspondances intra-villes
 [options="header"]
 |===
-| type ligne | villes reliées | durée (min) | émissions (kg CO2e) | prix (€)
-| avion | A, C | 135 | 120 | 110
-| train | A, C | 60 | 3 | 40
-| train | A, D | 120 | 8 | 60
-| train | A, E | 60 | 4 | 30
-| train | C, D | 90 | 4 | 70
-| train | D, E | 75 | 5 | 35
-| bus | A, B | 40 | 6 | 10
-| bus | A, E | 100 | 15 | 20
-| bus | B, C | 130 | 20 | 25
-| bus | B, E | 80 | 12 | 15
-| bus | C, D | 65 | 10 | 15
-| bus | D, E | 60 | 9 | 12
+| ville | moyens de transport reliés | durée (min) | prix (€)
+| A | Aéroport - Arrêt de bus | 30 | 0
+| A | Arrêt de bus - Gare | 15 | 0
+| C | Aéroport - Arrêt de bus | 40 | 0
+| C | Arrêt de bus - Gare | 15 | 0
+| D | Arrêt de bus - Gare | 20 | 0
+| E | Arrêt de bus - Gare | 15 | 0
 |===
 
 *Note : Dans le cadre d'une optimisation par le prix, nous considérons que les transferts à pied ont un coût de 0 €.*
@@ -114,12 +106,12 @@ Nous réutilisons l'exemple précédent avec l'ensemble des moyens de transport 
 
 1. [Bus uniquement] D_ArretBus -> E_ArretBus -> A_ArretBus
    - Prix : 12 + 20 = 32 €
-2. [Mixte Bus+Train] D_ArretBus -> E_ArretBus -> (Correspondance) -> E_Gare -> A_Gare
-   - Prix : 12 + 0 + 30 = 42 €
-3. [Bus uniquement] D_ArretBus -> C_ArretBus -> B_ArretBus -> A_ArretBus
+2. [Bus uniquement] D_ArretBus -> E_ArretBus -> B_ArretBus -> A_ArretBus
+   - Prix : 12 + 15 + 10 = 37 €
+3. [Mixte Bus+Train] D_ArretBus -> E_ArretBus -> (Correspondance) -> E_Gare -> A_Gare -> (Correspondance) -> A_ArretBus
+   - Prix : 12 + 0 + 30 + 0 = 42 €
+4. [Bus uniquement] D_ArretBus -> C_ArretBus -> B_ArretBus -> A_ArretBus
    - Prix : 15 + 25 + 10 = 50 €
-4. [Mixte Train+Bus] D_Gare -> E_Gare -> (Correspondance) -> E_ArretBus -> A_ArretBus
-   - Prix : 35 + 0 + 20 = 55 €
 
 === 2.2 Modèle pour l'exemple
 
@@ -131,7 +123,7 @@ image::Graphe.svg[Graphe Complet Version 2, width=600]
 
 Pour prendre en compte plusieurs modes de transport et leurs correspondances, le modèle évolue :
 
-* **Type de graphe :** La situation réelle s'apparente à un multigraphe à arêtes typées. Cependant, notre astuce de modélisation consiste à représenter chaque infrastructure (gare, aéroport, arrêt de bus) comme un sommet distinct. Cela nous permet d'obtenir un graphe simple, non-orienté et valué.
+* **Type de graphe :** Conceptuellement, le réseau physique est non-orienté puisque les moyens de transport circulent dans les deux sens. Cependant, la librairie Java fournie pour ce projet imposant l'utilisation de graphes orientés, nous modélisons chaque tronçon physique par deux arêtes orientées (une pour l'aller, une pour le retour). Pour la Version 1, nous filtrons les données pour obtenir un graphe simple, orienté et valué.
 * **Sommets du graphe :** L'ensemble de toutes les infrastructures de toutes les villes (par exemple, A_Gare, A_Aeroport, etc.).
 * **Arêtes et poids :** Il existe deux catégories d'arêtes :
   ** *Les connexions inter-villes :* Relient des infrastructures de même type entre deux villes (ex: D_Gare vers E_Gare). Le poids est le prix en euros de la connexion.
@@ -154,4 +146,4 @@ Recherche des meilleurs chemins de D_ArretBus à A_ArretBus :
 4) Itinéraire : D_ArretBus -> C_ArretBus -> B_ArretBus -> A_ArretBus | Prix total : 50 €
 ----
 
-* **Lien du commit :**
+* **Lien du commit :** https://gitlab.univ-lille.fr/sae2.01-2.02/2026/B5/-/commit/250a1138efa1a4bdf2741d59d643d191a14b5929
