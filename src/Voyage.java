@@ -1,5 +1,9 @@
 
+import java.util.ArrayList;
 import java.util.List;
+
+import fr.ulille.but.sae_s2_2026.Chemin;
+import fr.ulille.but.sae_s2_2026.Connexion;
  
 public class Voyage {
  
@@ -7,6 +11,13 @@ public class Voyage {
  
     public Voyage(List<Trajet> etapes) {
         this.etapes = etapes;
+    }
+    public Voyage(Chemin chemin) {
+        this.etapes = new ArrayList<Trajet>();
+        for (Connexion c : chemin.aretes()) {
+            Trajet t = (Trajet) c;
+            etapes.add(t);
+        }
     }
  
     public List<Trajet> getEtapes() {

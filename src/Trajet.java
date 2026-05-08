@@ -1,4 +1,7 @@
-public class Trajet  {
+import fr.ulille.but.sae_s2_2026.Connexion;
+import fr.ulille.but.sae_s2_2026.ModaliteTransport;
+
+public class Trajet implements Connexion {
 
     private Ville depart;
     private Ville arrivee;

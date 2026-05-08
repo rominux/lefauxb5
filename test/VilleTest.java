@@ -1,4 +1,7 @@
 import org.junit.Test;
+
+import fr.ulille.but.sae_s2_2026.ModaliteTransport;
+
 import static org.junit.Assert.*;
 
 public class VilleTest {

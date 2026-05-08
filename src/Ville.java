@@ -1,4 +1,7 @@
-public class Ville  {
+import fr.ulille.but.sae_s2_2026.Lieu;
+import fr.ulille.but.sae_s2_2026.ModaliteTransport;
+
+public class Ville implements Lieu {
  
     private String nom;
     private ModaliteTransport type;
