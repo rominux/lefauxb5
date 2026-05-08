@@ -1,5 +1,6 @@
 = Rapport SAÉ 2.01-2.02, ressource Graphes
-Équipe B5
+
+Équipe B5 - Kylian PLANTARD, Romain LEFEBVRE, Youssef CHEKALIL
 
 == 1. Version 1 : Un seul moyen de transport
 
