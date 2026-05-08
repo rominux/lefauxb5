@@ -1,0 +1,42 @@
+= Rapport POO - Version 1
+:toc:
+:toc-title: Sommaire
+
+== 1. Lancement et utilisation de l'application
+
+L'application peut être exécutée en ligne de commande. Les données initiales sont fournies sous la forme d'un tableau de chaînes de caractères (`String[]`) directement dans le code source, conformément aux exigences de la Version 1.
+
+Pour lancer l'application (en supposant que l'archive JAR a été générée à la racine du dépôt) :
+[source,bash]
+----
+java -jar sae_s2_2026.jar
+----
+
+== 2. Diagramme UML et réflexion sur les mécanismes objets
+
+image::UML version 1.png[Diagramme UML Version 1]
+
+La conception de notre application repose sur les interfaces `Lieu` et `Connexion`, ainsi que sur l'énumération `ModaliteTransport` (contenant `TRAIN`, `AVION`, `BUS`) telles que définies dans le cahier des charges.
+
+* **Modélisation des coûts :** Nous avons créé l'énumération `TypeCout` (`CO2`, `TEMPS`, `PRIX`) pour représenter les différents critères d'optimisation. Le coût d'une connexion est géré via la classe `Cout` qui encapsule une table associative (`Map<TypeCout, Double>`).
+* **Entités principales :**
+** `Voyageur` : Représente l'utilisateur, défini par son nom et un critère principal d'optimisation (`TypeCout`).
+** `Ville` : Implémente l'interface `Lieu`.
+** `Trajet` : Implémente l'interface `Connexion`.
+** `Voyage` : Modélise un itinéraire complet constitué d'une suite de `Connexion`s.
+** `Plateforme` : Centralise les lieux et les connexions, et fournit les méthodes pour comparer et filtrer les voyages.
+
+== 3. Analyse technique et critique de l'implémentation
+
+* **Validation des données :** Lors du chargement du tableau de chaînes de caractères, l'application vérifie la validité des informations. Les données incomplètes ou contenant des valeurs négatives pour les coûts sont ignorées/gérées pour ne pas corrompre le graphe.
+* **Filtrage unimodal :** Conformément à la Version 1, l'application filtre la liste des connexions pour ne conserver que celles correspondant au mode de transport souhaité par l'utilisateur (ex. uniquement `TRAIN`).
+* **Exclusion par seuil :** Nous avons implémenté des méthodes permettant d'exclure les trajets dont les coûts dépassent les bornes fixées par l'utilisateur (par exemple, rejeter tout voyage dont la durée dépasse un certain seuil).
+* **Tri des résultats :** Les itinéraires possibles sont récupérés et évalués en fonction du critère préférentiel de l'utilisateur (ex. minimisation du CO2) pour proposer la meilleure alternative.
+
+== 4. Analyse quantitative et qualitative des tests
+
+Des classes de tests unitaires ont été développées (ex. `VilleTest`, `TrajetTest`, `VoyageTest`, `VoyageurTest`, `CoutTest`, `PlateformeTest`) pour garantir la fiabilité de notre code :
+
+* **Couverture des entités :** Ces tests couvrent la création correcte des objets et le calcul exact des coûts cumulés pour un voyage.
+* **Comportement attendu :** Les scénarios de tests vérifient que le système réagit correctement face à des requêtes spécifiques et s'assurent que le filtrage par modalité de transport s'opère correctement.
+* Ces tests nous assurent une base solide pour pouvoir implémenter les versions suivantes (gestion des correspondances, sérialisation) sans risquer de introduire des régressions sur la base du calcul unimodal.
