@@ -1,7 +1,4 @@
-import fr.ulille.but.sae_s2_2026.Connexion;
-import fr.ulille.but.sae_s2_2026.ModaliteTransport;
-
-public class Trajet implements Connexion {
+public class Trajet  {
 
     private Ville depart;
     private Ville arrivee;
@@ -23,12 +20,10 @@ public class Trajet implements Connexion {
         return this.modalite;
     }
 
-    @Override
     public Ville getDepart() {
         return this.depart;
     }
 
-    @Override
     public Ville getArrivee() {
         return this.arrivee;
     }
