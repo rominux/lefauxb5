@@ -29,9 +29,12 @@ public class Ville implements Lieu {
         if (this == o) return true;
         if (!(o instanceof Ville)) return false;
         Ville ville = (Ville) o;
-        return nom.toLowerCase().equals(ville.nom.toLowerCase());
+        return nom.equals(ville.nom) && type == ville.type;
     }
- 
-    
-    
+
+    @Override
+    public int hashCode() {
+        return nom == null ? 0 : nom.hashCode();
+    }
+
 }
