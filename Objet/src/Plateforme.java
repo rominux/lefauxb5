@@ -36,26 +36,24 @@ public class Plateforme {
         return villes.get(normaliserNom(nom));
     }
 
-    public void chargerDonnees(String[] data, ModaliteTransport modalite) {
+    public void chargerDonnees(String[] data) {
         validerDonnees(data);
         for (String ligne : data) {
             String[] morceaux = ligne.split(";");
             String nomDepart = morceaux[0].trim();
             String nomArrivee = morceaux[1].trim();
             ModaliteTransport modaliteLigne = parseModalite(morceaux[2]);
-            if (modaliteLigne != modalite) {
-                continue;
-            }
+
             double prix = parseValeur(morceaux[3], "prix");
             double co2 = parseValeur(morceaux[4], "co2");
             double temps = parseValeur(morceaux[5], "temps");
 
-            Ville depart = enregistrerVille(nomDepart, modalite);
-            Ville arrivee = enregistrerVille(nomArrivee, modalite);
+            Ville depart = enregistrerVille(nomDepart, modaliteLigne);
+            Ville arrivee = enregistrerVille(nomArrivee, modaliteLigne);
             Cout cout = new Cout(temps, prix, co2);
 
-            Trajet aller = new Trajet(depart, arrivee, modalite, cout);
-            Trajet retour = new Trajet(arrivee, depart, modalite, cout);
+            Trajet aller = new Trajet(depart, arrivee, modaliteLigne, cout);
+            Trajet retour = new Trajet(arrivee, depart, modaliteLigne, cout);
             ajouterTrajet(aller);
             ajouterTrajet(retour);
         }
@@ -165,11 +163,10 @@ public class Plateforme {
             "villeC;villeD;Train;65;1.2;90"
         };
 
-        ModaliteTransport modalite = ModaliteTransport.TRAIN;
         TypeCout critere = TypeCout.CO2;
         int maxResultats = 4;
 
-        plateforme.chargerDonnees(data, modalite);
+        plateforme.chargerDonnees(data);
 
         Ville depart = plateforme.getVille("villeA");
         Ville arrivee = plateforme.getVille("villeD");
@@ -185,7 +182,7 @@ public class Plateforme {
         List<Voyage> meilleurs = plateforme.comparerVoyages(depart, arrivee, voyageur, maxResultats, limites);
 
         System.out.println("RESULTATS VERSION 1 : MODALITE UNIQUE");
-        System.out.println("Modalite : " + modalite + " | Critere : " + critere);
+        System.out.println("Critere : " + critere);
         System.out.println("Contraintes : TEMPS <= 180");
         System.out.println("Recherche des meilleurs voyages de " + depart + " a " + arrivee + " :\n");
 
