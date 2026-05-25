@@ -79,6 +79,7 @@ public class Plateforme {
                 Arret arrivee = enregistrerArret(nom, modaliteArrivee);
                 Cout cout = new Cout(temps, prix, co2);
 
+                // null pour les correspondances
                 Trajet aller = new Trajet(depart, arrivee, null, cout);
                 Trajet retour = new Trajet(arrivee, depart, null, cout);
                 
@@ -92,11 +93,11 @@ public class Plateforme {
         }
     }
 
-    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur) {
+    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur) throws NoResultException {
         return comparer(depart, arrivee, voyageur, 4);
     }
 
-    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur, int nombre) {
+    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur, int nombre) throws NoResultException {
         TypeCout typeCout = voyageur.getCritere();
         for (Connexion c : graphe.aretes()) {
             Trajet t = (Trajet) c;
@@ -105,10 +106,13 @@ public class Plateforme {
             graphe.modifierPoidsArete(t, valeur);
         }
         List<Chemin> kpcc = AlgorithmeKPCC.kpcc(graphe, depart, arrivee, nombre);
+        if (kpcc.size() == 0) {
+            throw new NoResultException();
+        }
         return kpcc;
     }
 
-    public List<Voyage> comparerVoyages(Lieu depart, Lieu arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) {
+    public List<Voyage> comparerVoyages(Lieu depart, Lieu arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) throws NoResultException, AllResultFilteredException {
         int kRecherche = Math.max(maxResultats, 10);
         List<Chemin> chemins = comparer(depart, arrivee, voyageur, kRecherche);
         List<Voyage> voyages = new ArrayList<>();
@@ -120,6 +124,9 @@ public class Plateforme {
                     break;
                 }
             }
+        }
+        if (voyages.size() == 0) {
+            throw new AllResultFilteredException();
         }
         return voyages;
     }
@@ -157,7 +164,7 @@ public class Plateforme {
                 plateforme.chargerReseau(fichierReseau);
             } else {
                 System.out.println("Fichier Réseau introuvable");
-                throw new RuntimeException("Fichier Réseau introuvable");
+                return;
             }
         }
         File fichierCorrespondances = new File(Plateforme.FICHIER_CORRESPONDANCES);
@@ -169,7 +176,7 @@ public class Plateforme {
                 plateforme.chargerCorrespondances(fichierCorrespondances);
             } else {
                 System.out.println("Fichier Correspondances introuvable");
-                throw new RuntimeException("Fichier Correspondances introuvable");
+                return;
             }
         }
         
@@ -184,17 +191,20 @@ public class Plateforme {
         Map<TypeCout, Double> limites = new HashMap<>();
         limites.put(TypeCout.TEMPS, 180.0);
 
-        List<Voyage> meilleurs = plateforme.comparerVoyages(depart, arrivee, voyageur, maxResultats, limites);
-
+        List<Voyage> meilleurs;
+        try {
+            meilleurs = plateforme.comparerVoyages(depart, arrivee, voyageur, maxResultats, limites);
+        } catch (NoResultException e) {
+            System.out.println("Aucun voyages n'as été trouvé entre les deux arrets");
+            return;
+        } catch (AllResultFilteredException e) {
+            System.out.println("Aucun voyages n'as été trouvé avec les limites définies");
+            return;
+        }
         System.out.println("RESULTATS VERSION 2 :");
         System.out.println("Critere : " + critere);
         System.out.println("Contraintes : TEMPS <= 180");
         System.out.println("Recherche des meilleurs voyages de " + depart + " a " + arrivee + " :\n");
-
-        if (meilleurs.isEmpty()) {
-            System.out.println("Aucun voyage possible avec ces criteres.");
-            return;
-        }
 
         for (int i = 0; i < meilleurs.size(); i++) {
             Voyage voyage = meilleurs.get(i);
