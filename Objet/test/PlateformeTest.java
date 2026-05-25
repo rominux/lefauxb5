@@ -11,18 +11,18 @@ import static org.junit.Assert.*;
 public class PlateformeTest {
 
     private Plateforme plateforme;
-    private Ville paris;
-    private Ville lyon;
-    private Ville marseille;
+    private Arret paris;
+    private Arret lyon;
+    private Arret marseille;
     private Trajet trajetParisLyon;
     private Trajet trajetLyonMarseille;
 
     @Before
     public void setUp() {
         plateforme = new Plateforme();
-        paris = new Ville("Paris", ModaliteTransport.TRAIN);
-        lyon = new Ville("Lyon", ModaliteTransport.TRAIN);
-        marseille = new Ville("Marseille", ModaliteTransport.TRAIN);
+        paris = new Arret("Paris", ModaliteTransport.TRAIN);
+        lyon = new Arret("Lyon", ModaliteTransport.TRAIN);
+        marseille = new Arret("Marseille", ModaliteTransport.TRAIN);
 
         Cout cout1 = new Cout(10.0, 5.0, 120.0);
         trajetParisLyon = new Trajet(paris, lyon, ModaliteTransport.TRAIN, cout1);

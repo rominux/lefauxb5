@@ -15,9 +15,9 @@ public class VoyageTest {
     // Réseau de l'exemple 1 : A -> B -> D
     @Before
     public void setUp() {
-        Ville villeA = new Ville("villeA", ModaliteTransport.TRAIN);
-        Ville villeB = new Ville("villeB", ModaliteTransport.TRAIN);
-        Ville villeD = new Ville("villeD", ModaliteTransport.TRAIN);
+        Arret villeA = new Arret("villeA", ModaliteTransport.TRAIN);
+        Arret villeB = new Arret("villeB", ModaliteTransport.TRAIN);
+        Arret villeD = new Arret("villeD", ModaliteTransport.TRAIN);
 
         Trajet t1 = new Trajet(villeA, villeB, ModaliteTransport.TRAIN, new Cout(80, 60, 1.7));
         Trajet t2 = new Trajet(villeB, villeD, ModaliteTransport.TRAIN, new Cout(40, 22, 2.4));

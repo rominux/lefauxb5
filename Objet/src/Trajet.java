@@ -3,12 +3,12 @@ import fr.ulille.but.sae_s2_2026.ModaliteTransport;
 
 public class Trajet implements Connexion {
 
-    private Ville depart;
-    private Ville arrivee;
+    private Arret depart;
+    private Arret arrivee;
     private ModaliteTransport modalite;
     private Cout cout;              
     
-    public Trajet(Ville depart, Ville arrivee, ModaliteTransport modalite, Cout cout) {
+    public Trajet(Arret depart, Arret arrivee, ModaliteTransport modalite, Cout cout) {
         this.depart = depart;
         this.arrivee = arrivee;
         this.modalite = modalite;
@@ -23,12 +23,16 @@ public class Trajet implements Connexion {
         return this.modalite;
     }
 
-    public Ville getDepart() {
+    public Arret getDepart() {
         return this.depart;
     }
 
-    public Ville getArrivee() {
+    public Arret getArrivee() {
         return this.arrivee;
+    }
+
+    public boolean estCorrespondance() {
+        return this.modalite == null;
     }
 
     @Override

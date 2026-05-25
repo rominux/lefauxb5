@@ -6,8 +6,8 @@ import static org.junit.Assert.*;
 
 public class TrajetTest {
 
-    private Ville villeA = new Ville("villeA", ModaliteTransport.TRAIN);
-    private Ville villeB = new Ville("villeB", ModaliteTransport.TRAIN);
+    private Arret villeA = new Arret("villeA", ModaliteTransport.TRAIN);
+    private Arret villeB = new Arret("villeB", ModaliteTransport.TRAIN);
     private Cout cout    = new Cout(80, 60, 1.7);
     private Trajet trajet = new Trajet(villeA, villeB, ModaliteTransport.TRAIN, cout);
 

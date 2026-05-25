@@ -1,12 +1,12 @@
 import fr.ulille.but.sae_s2_2026.Lieu;
 import fr.ulille.but.sae_s2_2026.ModaliteTransport;
 
-public class Ville implements Lieu {
+public class Arret implements Lieu {
  
     private String nom;
     private ModaliteTransport type;
 
-    public Ville(String nom, ModaliteTransport type) {
+    public Arret(String nom, ModaliteTransport type) {
         this.nom = nom;
         this.type = type;
     }
@@ -27,9 +27,9 @@ public class Ville implements Lieu {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Ville)) return false;
-        Ville ville = (Ville) o;
-        return nom.equals(ville.nom) && type == ville.type;
+        if (!(o instanceof Arret)) return false;
+        Arret arret = (Arret) o;
+        return nom.equals(arret.nom) && type == arret.type;
     }
 
     @Override
