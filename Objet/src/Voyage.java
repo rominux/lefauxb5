@@ -35,17 +35,41 @@ public class Voyage {
  
     @Override
     public String toString() {
-        String resultat = "";
-        for (int i = 0; i < etapes.size(); i++) {
-            Trajet t = (Trajet) etapes.get(i);
-            if (i == 0) {
-                resultat += t.getDepart().getNom();
-            }
-            resultat += " -> " + t.getArrivee().getNom() + " (" + t.getModalite() + ")";
+        if (etapes == null || etapes.isEmpty()) {
+            return "Voyage vide";
         }
-        resultat += " | " + getCoutTotal(TypeCout.TEMPS) + " min"
-                + " | " + getCoutTotal(TypeCout.CO2) + " kg CO2e"
-                + " | " + getCoutTotal(TypeCout.PRIX) + " €";
-        return resultat;
+
+        StringBuilder resultat = new StringBuilder();
+        
+        Trajet premierTrajet = etapes.get(0);
+        resultat.append(premierTrajet.getDepart().getNom());
+        if (premierTrajet.getModalite() != null) {
+            resultat.append(" (").append(premierTrajet.getModalite()).append(")");
+        }
+
+        for (int i = 0; i < etapes.size(); i++) {
+            Trajet t = etapes.get(i);
+
+            if (t.getModalite() == null) {
+                resultat.append(" -> ").append(t.getDepart().getNom()).append(" [Changement]");
+                
+                for (int j = i + 1; j < etapes.size(); j++) {
+                    if (etapes.get(j).getModalite() != null) {
+                        resultat.append(" (").append(etapes.get(j).getModalite()).append(")");
+                        break;
+                    }
+                }
+            }
+
+            if (i == etapes.size() - 1) {
+                resultat.append(" -> ").append(t.getArrivee().getNom());
+            }
+        }
+
+        resultat.append(" | ").append(getCoutTotal(TypeCout.TEMPS)).append(" min")
+                .append(" | ").append(getCoutTotal(TypeCout.CO2)).append(" kg CO2e")
+                .append(" | ").append(getCoutTotal(TypeCout.PRIX)).append(" €");
+
+        return resultat.toString();
     }
 }

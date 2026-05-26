@@ -24,17 +24,20 @@ public class Arret implements Lieu {
         return this.nom;
     }
     
-    @Override
+   @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Arret)) return false;
         Arret arret = (Arret) o;
-        return nom.equals(arret.nom) && type == arret.type;
+        if (nom == null || arret.nom == null || type == null || arret.type == null) return false;
+        return nom.equalsIgnoreCase(arret.nom) && type == arret.type;
     }
 
     @Override
     public int hashCode() {
-        return nom == null ? 0 : nom.hashCode();
+        int result = nom == null ? 0 : nom.toLowerCase().hashCode();
+        result = 31 * result + (type == null ? 0 : type.hashCode());
+        return result;
     }
 
 }

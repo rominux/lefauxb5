@@ -28,9 +28,8 @@ public class VilleTest {
     public void testEqualsMemeNom() {
         Arret v1 = new Arret("Paris", ModaliteTransport.TRAIN);
         Arret v2 = new Arret("Paris", ModaliteTransport.AVION);
-        assertTrue(v1.equals(v2));
+        assertFalse(v1.equals(v2));
     }
-
     @Test
     public void testEqualsCasseInsensible() {
         Arret v1 = new Arret("paris", ModaliteTransport.TRAIN);

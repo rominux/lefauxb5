@@ -144,7 +144,7 @@ public class Plateforme {
         return true;
     }
 
-    private Arret enregistrerArret(String nom, ModaliteTransport modalite) {
+    public Arret enregistrerArret(String nom, ModaliteTransport modalite) {
         Arret arret = new Arret(nom.trim(), modalite);
         graphe.ajouterSommet(arret);
         return arret;
@@ -209,6 +209,14 @@ public class Plateforme {
         for (int i = 0; i < meilleurs.size(); i++) {
             Voyage voyage = meilleurs.get(i);
             System.out.println((i + 1) + ") " + voyage);
+        }
+    }
+
+    public void ajouterTrajet(Trajet trajet) {
+        if (trajet != null) {
+            graphe.ajouterSommet(trajet.getDepart());
+            graphe.ajouterSommet(trajet.getArrivee());
+            graphe.ajouterArete(trajet, 0);
         }
     }
 }
