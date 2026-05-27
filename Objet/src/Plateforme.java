@@ -26,7 +26,7 @@ public class Plateforme {
         for (Lieu lieu : graphe.sommets()) {
             if (lieu instanceof Arret) {
                 Arret arret = (Arret) lieu;
-                if (arret.getNom().equals(nom) && arret.getType().equals(modalite)) return arret;
+                if (arret.getNom().equals(nom) && arret.getType() != null && arret.getType().equals(modalite)) return arret;
             }
         }
         return null; 
@@ -52,8 +52,8 @@ public class Plateforme {
                 Trajet aller = new Trajet(depart, arrivee, modaliteLigne, cout);
                 Trajet retour = new Trajet(arrivee, depart, modaliteLigne, cout);
                 // on donne un poids de 0 car on définira les poids par rapport au critère choisi plus tard
-                graphe.ajouterArete(aller, 0);
-                graphe.ajouterArete(retour, 0);
+                ajouterTrajet(aller);
+                ajouterTrajet(retour);
                 ligne = br.readLine();
             } while (ligne != null && ligne.trim().length() > 0);
         } catch (IOException e) {
@@ -83,8 +83,8 @@ public class Plateforme {
                 Trajet aller = new Trajet(depart, arrivee, null, cout);
                 Trajet retour = new Trajet(arrivee, depart, null, cout);
                 
-                graphe.ajouterArete(aller, 0);
-                graphe.ajouterArete(retour, 0);
+                ajouterTrajet(aller);
+                ajouterTrajet(retour);
                 ligne = br.readLine();
             } while (ligne != null && ligne.trim().length() > 0);
         } catch (IOException e) {
@@ -93,11 +93,11 @@ public class Plateforme {
         }
     }
 
-    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur) throws NoResultException {
+    public List<Chemin> comparer(Arret depart, Arret arrivee, Voyageur voyageur) throws NoResultException {
         return comparer(depart, arrivee, voyageur, 4);
     }
 
-    public List<Chemin> comparer(Lieu depart, Lieu arrivee, Voyageur voyageur, int nombre) throws NoResultException {
+    public List<Chemin> comparer(Arret depart, Arret arrivee, Voyageur voyageur, int nombre) throws NoResultException {
         TypeCout typeCout = voyageur.getCritere();
         for (Connexion c : graphe.aretes()) {
             Trajet t = (Trajet) c;
@@ -112,7 +112,7 @@ public class Plateforme {
         return kpcc;
     }
 
-    public List<Voyage> comparerVoyages(Lieu depart, Lieu arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) throws NoResultException, AllResultFilteredException {
+    public List<Voyage> comparerVoyages(Arret depart, Arret arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) throws NoResultException, AllResultFilteredException {
         int kRecherche = Math.max(maxResultats, 10);
         List<Chemin> chemins = comparer(depart, arrivee, voyageur, kRecherche);
         List<Voyage> voyages = new ArrayList<>();
@@ -150,6 +150,21 @@ public class Plateforme {
         return arret;
     }
 
+    public Arret creerArretVille(String nom, boolean arrive) {
+        Arret arret = enregistrerArret(nom, null);
+        for (ModaliteTransport m : ModaliteTransport.values()) {
+            Arret dest = getArret(nom, m);
+            if (dest != null) {
+                if (arrive) {
+                    ajouterTrajet(new Trajet(dest, arret, null, new Cout(0, 0, 0)));
+                } else {
+                    ajouterTrajet(new Trajet(arret, dest, null, new Cout(0, 0, 0)));
+                }
+            }
+        }
+        return arret;
+    }
+
     public static void main(String[] args) {
         Plateforme plateforme = new Plateforme();
         TypeCout critere = TypeCout.CO2;
@@ -180,8 +195,8 @@ public class Plateforme {
             }
         }
         
-        Arret depart = plateforme.getArret("A", ModaliteTransport.TRAIN);
-        Arret arrivee = plateforme.getArret("M", ModaliteTransport.TRAIN);
+        Arret depart = plateforme.creerArretVille("A", false);
+        Arret arrivee = plateforme.creerArretVille("M", true);
         if (depart == null || arrivee == null) {
             System.out.println("Ville de depart ou d'arrivee introuvable pour la modalite choisie.");
             return;
@@ -214,8 +229,6 @@ public class Plateforme {
 
     public void ajouterTrajet(Trajet trajet) {
         if (trajet != null) {
-            graphe.ajouterSommet(trajet.getDepart());
-            graphe.ajouterSommet(trajet.getArrivee());
             graphe.ajouterArete(trajet, 0);
         }
     }

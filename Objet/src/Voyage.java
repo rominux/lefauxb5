@@ -41,17 +41,17 @@ public class Voyage {
 
         StringBuilder resultat = new StringBuilder();
         
-        Trajet premierTrajet = etapes.get(0);
+        Trajet premierTrajet = etapes.get(1);
         resultat.append(premierTrajet.getDepart().getNom());
         if (premierTrajet.getModalite() != null) {
             resultat.append(" (").append(premierTrajet.getModalite()).append(")");
         }
 
-        for (int i = 0; i < etapes.size(); i++) {
+        for (int i = 1; i < etapes.size()-1; i++) {
             Trajet t = etapes.get(i);
 
             if (t.getModalite() == null) {
-                resultat.append(" -> ").append(t.getDepart().getNom()).append(" [Changement]");
+                resultat.append(" -> ").append(t.getDepart().getNom());
                 
                 for (int j = i + 1; j < etapes.size(); j++) {
                     if (etapes.get(j).getModalite() != null) {
@@ -61,7 +61,7 @@ public class Voyage {
                 }
             }
 
-            if (i == etapes.size() - 1) {
+            if (i == etapes.size() - 2) {
                 resultat.append(" -> ").append(t.getArrivee().getNom());
             }
         }
