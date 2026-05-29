@@ -21,7 +21,7 @@ public class VilleTest {
     @Test
     public void testToString() {
         Arret v = new Arret("Paris", ModaliteTransport.TRAIN);
-        assertEquals("Paris", v.toString());
+        assertEquals("Paris (TRAIN)", v.toString());
     }
 
     @Test

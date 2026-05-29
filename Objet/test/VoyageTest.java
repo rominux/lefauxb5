@@ -67,20 +67,21 @@ public class VoyageTest {
 public void testToStringPointsDInteretUniquement() {
     Arret lille = new Arret("Lille", ModaliteTransport.TRAIN);
     Arret douai = new Arret("Douai", ModaliteTransport.TRAIN);
+    Arret douaiBus = new Arret("Douai", ModaliteTransport.BUS);
     Arret arras = new Arret("Arras", ModaliteTransport.BUS);
     Arret bapaume = new Arret("Bapaume", ModaliteTransport.BUS);
 
     List<Trajet> etapes = new ArrayList<>();
     etapes.add(new Trajet(lille, douai, ModaliteTransport.TRAIN, new Cout(20, 10, 0.5)));
-    etapes.add(new Trajet(douai, douai, null, new Cout(10, 0, 0)));
-    etapes.add(new Trajet(douai, arras, ModaliteTransport.BUS, new Cout(30, 5, 0.2)));
+    etapes.add(new Trajet(douai, douaiBus, null, new Cout(10, 0, 0)));
+    etapes.add(new Trajet(douaiBus, arras, ModaliteTransport.BUS, new Cout(30, 5, 0.2)));
     etapes.add(new Trajet(arras, bapaume, ModaliteTransport.BUS, new Cout(20, 3, 0.1)));
 
     Voyage voyageMultimodal = new Voyage(etapes);
     String affichage = voyageMultimodal.toString();
 
     assertTrue(affichage.contains("Lille (TRAIN)"));
-    assertTrue(affichage.contains("Douai [Changement] (BUS)"));
+    assertTrue(affichage.contains("Douai (BUS)"));
     assertTrue(affichage.contains("Bapaume"));
 
     assertFalse(affichage.contains("Arras"));
