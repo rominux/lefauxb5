@@ -232,6 +232,7 @@ public class Plateforme {
         for (int i = 0; i < meilleurs.size(); i++) {
             Voyage voyage = meilleurs.get(i);
             System.out.println((i + 1) + ") " + voyage);
+            // System.out.println((i + 1) + ") " + voyage.toStringDetaille());
         }
     }
 

@@ -13,7 +13,7 @@ public class Arret implements Lieu {
 
     @Override
     public String toString() {
-        return this.nom;
+        return this.nom + " (" + this.type + ")";
     }
 
     public ModaliteTransport getType() {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import fr.ulille.but.sae_s2_2026.Chemin;
 import fr.ulille.but.sae_s2_2026.Connexion;
+import fr.ulille.but.sae_s2_2026.ModaliteTransport;
  
 public class Voyage {
  
@@ -48,28 +49,15 @@ public class Voyage {
         StringBuilder resultat = new StringBuilder();
         
         Trajet premierTrajet = etapes.get(0);
-        resultat.append(premierTrajet.getDepart().getNom());
-        if (premierTrajet.getModalite() != null) {
-            resultat.append(" (").append(premierTrajet.getModalite()).append(")");
-        }
+        ModaliteTransport modalite = premierTrajet.getModalite();
+        resultat.append(premierTrajet.getDepart().getNom()).append(" (").append(modalite).append(")");
 
         for (int i = 0; i < etapes.size(); i++) {
             Trajet t = etapes.get(i);
-
-            if (t.getModalite() == null) {
-                if (i > 0 && etapes.get(i - 1).getModalite() == null) {
-                    continue;
-                }
-                resultat.append(" -> ").append(t.getDepart().getNom()).append(" [Changement]");
-                
-                for (int j = i + 1; j < etapes.size(); j++) {
-                    if (etapes.get(j).getModalite() != null) {
-                        resultat.append(" (").append(etapes.get(j).getModalite()).append(")");
-                        break;
-                    }
-                }
+            if (t.getModalite() != modalite && t.getModalite() == null) {
+                resultat.append(" -> ").append(t.getArrivee().getNom()).append(" (").append(t.getArrivee().getType()).append(")");
+                modalite = t.getArrivee().getType();
             }
-
             if (i == etapes.size() - 1) {
                 resultat.append(" -> ").append(t.getArrivee().getNom());
             }
@@ -79,6 +67,14 @@ public class Voyage {
                 .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.CO2))).append(" kg CO2e")
                 .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.PRIX))).append(" €");
 
+        return resultat.toString();
+    }
+
+    public String toStringDetaille() {
+        StringBuilder resultat = new StringBuilder();
+        for (Trajet t : etapes) {
+            resultat.append(t.toString()).append("\n");
+        }
         return resultat.toString();
     }
 }
