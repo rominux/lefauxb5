@@ -18,6 +18,12 @@ public class Voyage {
             Trajet t = (Trajet) c;
             etapes.add(t);
         }
+        while (!etapes.isEmpty() && etapes.get(0).getModalite() == null) {
+            etapes.remove(0);
+        }
+        while (!etapes.isEmpty() && etapes.get(etapes.size() - 1).getModalite() == null) {
+            etapes.remove(etapes.size() - 1);
+        }
     }
  
     public List<Trajet> getEtapes() {
@@ -41,17 +47,20 @@ public class Voyage {
 
         StringBuilder resultat = new StringBuilder();
         
-        Trajet premierTrajet = etapes.get(1);
+        Trajet premierTrajet = etapes.get(0);
         resultat.append(premierTrajet.getDepart().getNom());
         if (premierTrajet.getModalite() != null) {
             resultat.append(" (").append(premierTrajet.getModalite()).append(")");
         }
 
-        for (int i = 1; i < etapes.size()-1; i++) {
+        for (int i = 0; i < etapes.size(); i++) {
             Trajet t = etapes.get(i);
 
             if (t.getModalite() == null) {
-                resultat.append(" -> ").append(t.getDepart().getNom());
+                if (i > 0 && etapes.get(i - 1).getModalite() == null) {
+                    continue;
+                }
+                resultat.append(" -> ").append(t.getDepart().getNom()).append(" [Changement]");
                 
                 for (int j = i + 1; j < etapes.size(); j++) {
                     if (etapes.get(j).getModalite() != null) {
@@ -61,14 +70,14 @@ public class Voyage {
                 }
             }
 
-            if (i == etapes.size() - 2) {
+            if (i == etapes.size() - 1) {
                 resultat.append(" -> ").append(t.getArrivee().getNom());
             }
         }
 
-        resultat.append(" | ").append(getCoutTotal(TypeCout.TEMPS)).append(" min")
-                .append(" | ").append(getCoutTotal(TypeCout.CO2)).append(" kg CO2e")
-                .append(" | ").append(getCoutTotal(TypeCout.PRIX)).append(" €");
+        resultat.append(" | ").append((int) getCoutTotal(TypeCout.TEMPS)).append(" min")
+                .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.CO2))).append(" kg CO2e")
+                .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.PRIX))).append(" €");
 
         return resultat.toString();
     }

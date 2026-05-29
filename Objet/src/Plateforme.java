@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -116,12 +117,19 @@ public class Plateforme {
         int kRecherche = Math.max(maxResultats, 10);
         List<Chemin> chemins = comparer(depart, arrivee, voyageur, kRecherche);
         List<Voyage> voyages = new ArrayList<>();
+        HashSet<String> vus = new HashSet<>();
         for (Chemin chemin : chemins) {
             Voyage voyage = new Voyage(chemin);
             if (respecteLimites(voyage, limites)) {
-                voyages.add(voyage);
-                if (voyages.size() == maxResultats) {
-                    break;
+                StringBuilder sb = new StringBuilder();
+                for (Trajet t : voyage.getEtapes()) {
+                    sb.append(t.getDepart().getNom()).append(t.getArrivee().getNom()).append(t.getModalite());
+                }
+                if (vus.add(sb.toString())) {
+                    voyages.add(voyage);
+                    if (voyages.size() == maxResultats) {
+                        break;
+                    }
                 }
             }
         }
@@ -168,7 +176,7 @@ public class Plateforme {
     public static void main(String[] args) {
         Plateforme plateforme = new Plateforme();
         TypeCout critere = TypeCout.CO2;
-        int maxResultats = 4;
+        int maxResultats = 100;
 
         File fichierReseau = new File(Plateforme.FICHIER_RESEAU);
         if (fichierReseau.exists() && fichierReseau.isFile()) {
