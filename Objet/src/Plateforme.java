@@ -115,8 +115,8 @@ public class Plateforme {
     }
 
     public List<Voyage> comparerVoyages(Arret depart, Arret arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) throws NoResultException, AllResultFilteredException {
-        int kRecherche = Math.max(maxResultats, 10);
-        List<Chemin> chemins = comparer(depart, arrivee, voyageur, kRecherche);
+        // on prend plus de résultats que nécessaire pour pouvoir filtrer avec les limites
+        List<Chemin> chemins = comparer(depart, arrivee, voyageur, 4*maxResultats);
         List<Voyage> voyages = new ArrayList<>();
         HashSet<String> vus = new HashSet<>();
         for (Chemin chemin : chemins) {
@@ -138,6 +138,20 @@ public class Plateforme {
             throw new AllResultFilteredException();
         }
         return voyages;
+    }
+
+    public static void trierVoyages(List<Voyage> voyages, TypeCout critere1, TypeCout critere2, TypeCout critere3) {
+        voyages.sort((v1, v2) -> {
+            int c1 = Double.compare(v1.getCoutTotal(critere1), v2.getCoutTotal(critere1));
+            if (c1 != 0) {
+                return c1;
+            }
+            int c2 = Double.compare(v1.getCoutTotal(critere2), v2.getCoutTotal(critere2));
+            if (c2 != 0) {
+                return c2;
+            }
+            return Double.compare(v1.getCoutTotal(critere3), v2.getCoutTotal(critere3));
+        });
     }
 
     private static boolean respecteLimites(Voyage voyage, Map<TypeCout, Double> limites) {
@@ -181,7 +195,9 @@ public class Plateforme {
 
 
         Plateforme plateforme = new Plateforme();
-        TypeCout critere = TypeCout.CO2;
+        TypeCout critere1 = TypeCout.CO2;
+        TypeCout critere2 = TypeCout.TEMPS;
+        TypeCout critere3 = TypeCout.PRIX;
         int maxResultats = 100;
 
         File fichierReseau = new File(Plateforme.FICHIER_RESEAU);
@@ -216,13 +232,15 @@ public class Plateforme {
             return;
         }
 
-        Voyageur voyageur = new Voyageur("Utilisateur", critere);
+        Voyageur voyageur = new Voyageur("Utilisateur", critere1);
         Map<TypeCout, Double> limites = new HashMap<>();
         limites.put(TypeCout.TEMPS, 180.0);
+        limites.put(TypeCout.PRIX, 299.0);
 
         List<Voyage> meilleurs;
         try {
             meilleurs = plateforme.comparerVoyages(depart, arrivee, voyageur, maxResultats, limites);
+            Plateforme.trierVoyages(meilleurs, critere1, critere2, critere3);
         } catch (NoResultException e) {
             System.out.println("Aucun voyages n'as été trouvé entre les deux arrets");
             return;
@@ -231,14 +249,17 @@ public class Plateforme {
             return;
         }
         System.out.println("RESULTATS VERSION 3 :");
-        System.out.println("Critere : " + critere);
-        System.out.println("Contraintes : TEMPS <= 180");
-        System.out.println("Recherche des meilleurs voyages de " + depart + " a " + arrivee + " :\n");
+        System.out.println("Criteres : " + critere1 + " puis " + critere2 + " puis " + critere3);
+        System.out.print("Contraintes :");
+        for (Map.Entry<TypeCout, Double> entree : limites.entrySet()) {
+            System.out.print(" " + entree.getKey() + " <= " + entree.getValue());
+        }
+        System.out.println();
+        System.out.println("Recherche des meilleurs voyages de " + depart.getNom() + " a " + arrivee.getNom() + " :\n");
 
         for (int i = 0; i < meilleurs.size(); i++) {
             Voyage voyage = meilleurs.get(i);
             System.out.println((i + 1) + ") " + voyage);
-            // System.out.println((i + 1) + ") " + voyage.toStringDetaille());
         }
 
         System.out.println("\nEntrez le numéro du voyage que vous souhaitez enregistrer dans l'historique (ou 0 pour ne pas en enregistrer) :");
