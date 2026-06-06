@@ -14,7 +14,7 @@ public class ArretTest {
     @Test
     public void testToString() {
         Arret arret = new Arret("Gare de l'Est", ModaliteTransport.TRAIN);
-        assertEquals("Gare de l'Est", arret.toString());
+        assertEquals("Gare de l'Est (TRAIN)", arret.toString());
     }
 
     @Test
