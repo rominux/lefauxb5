@@ -1,7 +1,9 @@
+import java.io.Serializable;
+
 import fr.ulille.but.sae_s2_2026.Lieu;
 import fr.ulille.but.sae_s2_2026.ModaliteTransport;
 
-public class Arret implements Lieu {
+public class Arret implements Lieu, Serializable {
  
     private String nom;
     private ModaliteTransport type;

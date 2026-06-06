@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
  
-public class Cout {
+public class Cout implements Serializable {
  
     private Map<TypeCout, Double> valeurs;
  

@@ -1,7 +1,9 @@
+import java.io.Serializable;
+
 import fr.ulille.but.sae_s2_2026.Connexion;
 import fr.ulille.but.sae_s2_2026.ModaliteTransport;
 
-public class Trajet implements Connexion {
+public class Trajet implements Connexion, Serializable {
 
     private Arret depart;
     private Arret arrivee;

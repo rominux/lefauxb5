@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -174,6 +175,11 @@ public class Plateforme {
     }
 
     public static void main(String[] args) {
+        Historique historique = new Historique();
+        System.out.println("Historique des trajets :");
+        System.out.println(historique);
+
+
         Plateforme plateforme = new Plateforme();
         TypeCout critere = TypeCout.CO2;
         int maxResultats = 100;
@@ -224,7 +230,7 @@ public class Plateforme {
             System.out.println("Aucun voyages n'as été trouvé avec les limites définies");
             return;
         }
-        System.out.println("RESULTATS VERSION 2 :");
+        System.out.println("RESULTATS VERSION 3 :");
         System.out.println("Critere : " + critere);
         System.out.println("Contraintes : TEMPS <= 180");
         System.out.println("Recherche des meilleurs voyages de " + depart + " a " + arrivee + " :\n");
@@ -233,6 +239,24 @@ public class Plateforme {
             Voyage voyage = meilleurs.get(i);
             System.out.println((i + 1) + ") " + voyage);
             // System.out.println((i + 1) + ") " + voyage.toStringDetaille());
+        }
+
+        System.out.println("\nEntrez le numéro du voyage que vous souhaitez enregistrer dans l'historique (ou 0 pour ne pas en enregistrer) :");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            int choix = Integer.parseInt(reader.readLine());
+            if (choix > 0 && choix <= meilleurs.size()) {
+                historique.ajouterVoyage(meilleurs.get(choix - 1));
+                historique.sauvegarder();
+                System.out.println("Voyage enregistré dans l'historique.");
+            } else {
+                System.out.println("Aucun voyage enregistré.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Entrée invalide, aucun voyage enregistré.");
+            return;
+        } catch (IOException e) {
+            System.out.println("Erreur de lecture, aucun voyage enregistré.");
+            return;
         }
     }
 

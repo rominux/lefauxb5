@@ -1,4 +1,5 @@
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,7 +7,7 @@ import fr.ulille.but.sae_s2_2026.Chemin;
 import fr.ulille.but.sae_s2_2026.Connexion;
 import fr.ulille.but.sae_s2_2026.ModaliteTransport;
  
-public class Voyage {
+public class Voyage implements Serializable {
  
     private List<Trajet> etapes;
  
@@ -75,6 +76,17 @@ public class Voyage {
         for (Trajet t : etapes) {
             resultat.append(t.toString()).append("\n");
         }
+        return resultat.toString();
+    }
+
+    public String toStringHistorique() {
+        StringBuilder resultat = new StringBuilder();
+        resultat.append(etapes.get(0).getDepart().getNom())
+                .append(" -> ")
+                .append(etapes.get(etapes.size() - 1).getArrivee().getNom())
+                .append(" | ").append((int) getCoutTotal(TypeCout.TEMPS)).append(" min")
+                .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.CO2))).append(" kg CO2e")
+                .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.PRIX))).append(" €");
         return resultat.toString();
     }
 }
