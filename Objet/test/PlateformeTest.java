@@ -5,6 +5,7 @@ import fr.ulille.but.sae_s2_2026.Chemin;
 import fr.ulille.but.sae_s2_2026.ModaliteTransport;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
@@ -130,5 +131,38 @@ public class PlateformeTest {
                 fail("Le chargement des fichiers CSV a généré une exception : " + e.getMessage());
             }
         }
+    }
+
+    @Test
+    public void testTrierVoyages() {
+        Arret a = new Arret("A", ModaliteTransport.TRAIN);
+        Arret b = new Arret("B", ModaliteTransport.TRAIN);
+        Arret c = new Arret("C", ModaliteTransport.TRAIN);
+
+        Trajet t1 = new Trajet(a, b, ModaliteTransport.TRAIN, new Cout(10.0, 5.0, 50.0));
+        ArrayList<Trajet> liste1 = new ArrayList<>();
+        liste1.add(t1);
+        Voyage v1 = new Voyage(liste1);
+
+        Trajet t2 = new Trajet(a, c, ModaliteTransport.TRAIN, new Cout(8.0, 8.0, 60.0));
+        ArrayList<Trajet> liste2 = new ArrayList<>();
+        liste2.add(t2);
+        Voyage v2 = new Voyage(liste2);
+
+        Trajet t3 = new Trajet(b, c, ModaliteTransport.TRAIN, new Cout(10.0, 4.0, 70.0));
+        ArrayList<Trajet> liste3 = new ArrayList<>();
+        liste3.add(t3);
+        Voyage v3 = new Voyage(liste3);
+
+        List<Voyage> liste = new ArrayList<>();
+        liste.add(v1);
+        liste.add(v2);
+        liste.add(v3);
+
+        Plateforme.trierVoyages(liste, TypeCout.TEMPS, TypeCout.PRIX, TypeCout.CO2);
+
+        assertEquals(v2, liste.get(0));
+        assertEquals(v3, liste.get(1));
+        assertEquals(v1, liste.get(2));
     }
 }
