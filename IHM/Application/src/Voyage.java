@@ -89,4 +89,39 @@ public class Voyage implements Serializable {
                 .append(" | ").append(String.format("%.2f", getCoutTotal(TypeCout.PRIX))).append(" €");
         return resultat.toString();
     }
+
+    public String formaterItineraire() {
+        if (etapes == null || etapes.isEmpty()) return "Voyage vide";
+        StringBuilder sb = new StringBuilder();
+        sb.append(etapes.get(0).getDepart().getNom());
+        ModaliteTransport modaliteCourante = etapes.get(0).getModalite();
+        for (int i = 0; i < etapes.size(); i++) {
+            Trajet t = etapes.get(i);
+            if (t.getModalite() != modaliteCourante) {
+                sb.append(" (").append(modaliteCourante).append(")");
+                sb.append(" \u2192 ").append(t.getDepart().getNom());
+                modaliteCourante = t.getModalite();
+            }
+            if (i == etapes.size() - 1) {
+                if (t.getModalite() != null) {
+                    sb.append(" (").append(t.getModalite()).append(")");
+                }
+                sb.append(" \u2192 ").append(t.getArrivee().getNom());
+            }
+        }
+        return sb.toString();
+    }
+
+    public String getVillesUniques() {
+        if (etapes == null || etapes.isEmpty()) return "Voyage vide";
+        List<String> villes = new ArrayList<>();
+        villes.add(etapes.get(0).getDepart().getNom());
+        for (Trajet t : etapes) {
+            String arrivee = t.getArrivee().getNom();
+            if (!villes.get(villes.size() - 1).equals(arrivee)) {
+                villes.add(arrivee);
+            }
+        }
+        return String.join(" - ", villes);
+    }
 }

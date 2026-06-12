@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(new File("res/tp6_Sae.fxml").toURI().toURL());
         BorderPane root = loader.load();
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root, 1500, 800);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Assistant de voyage");
         primaryStage.show();

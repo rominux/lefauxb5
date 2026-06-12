@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Historique {
     private ArrayList<Voyage> voyages;
-    private static final String FICHIER_HISTORIQUE = "res/historique.sae"; // extension custom
+    private static final String FICHIER_HISTORIQUE = "res/historique.sae";
 
     public Historique() {
         File fichier = new File(FICHIER_HISTORIQUE);
@@ -42,5 +42,9 @@ public class Historique {
             sb.append(v.toStringHistorique()).append("\n");
         }
         return sb.toString();
+    }
+
+    public ArrayList<Voyage> getVoyages() {
+        return this.voyages;
     }
 }

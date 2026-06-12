@@ -4,10 +4,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import fr.ulille.but.sae_s2_2026.AlgorithmeKPCC;
 import fr.ulille.but.sae_s2_2026.Chemin;
@@ -32,6 +34,21 @@ public class Plateforme {
             }
         }
         return null; 
+    }
+
+    public List<String> getVilles() {
+        Set<String> villes = new HashSet<>();
+        for (Lieu lieu : graphe.sommets()) {
+            if (lieu instanceof Arret) {
+                Arret arret = (Arret) lieu;
+                if (arret.getNom() != null && arret.getType() != null) {
+                    villes.add(arret.getNom());
+                }
+            }
+        }
+        List<String> liste = new ArrayList<>(villes);
+        Collections.sort(liste);
+        return liste;
     }
 
     public void chargerReseau(File fichierReseau) {
@@ -96,10 +113,14 @@ public class Plateforme {
     }
 
     public List<Chemin> comparer(Arret depart, Arret arrivee, Voyageur voyageur) throws NoResultException {
-        return comparer(depart, arrivee, voyageur, 4);
+        return comparer(depart, arrivee, voyageur, 4, null);
     }
 
     public List<Chemin> comparer(Arret depart, Arret arrivee, Voyageur voyageur, int nombre) throws NoResultException {
+        return comparer(depart, arrivee, voyageur, nombre, null);
+    }
+
+    public List<Chemin> comparer(Arret depart, Arret arrivee, Voyageur voyageur, int nombre, Set<ModaliteTransport> modes) throws NoResultException {
         TypeCout typeCout = voyageur.getCritere();
         for (Connexion c : graphe.aretes()) {
             Trajet t = (Trajet) c;
@@ -115,13 +136,16 @@ public class Plateforme {
     }
 
     public List<Voyage> comparerVoyages(Arret depart, Arret arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites) throws NoResultException, AllResultFilteredException {
-        // on prend plus de résultats que nécessaire pour pouvoir filtrer avec les limites
+        return comparerVoyages(depart, arrivee, voyageur, maxResultats, limites, null);
+    }
+
+    public List<Voyage> comparerVoyages(Arret depart, Arret arrivee, Voyageur voyageur, int maxResultats, Map<TypeCout, Double> limites, Set<ModaliteTransport> modes) throws NoResultException, AllResultFilteredException {
         List<Chemin> chemins = comparer(depart, arrivee, voyageur, 4*maxResultats);
         List<Voyage> voyages = new ArrayList<>();
         HashSet<String> vus = new HashSet<>();
         for (Chemin chemin : chemins) {
             Voyage voyage = new Voyage(chemin);
-            if (respecteLimites(voyage, limites)) {
+            if (respecteLimites(voyage, limites) && respecteModes(voyage, modes)) {
                 StringBuilder sb = new StringBuilder();
                 for (Trajet t : voyage.getEtapes()) {
                     sb.append(t.getDepart().getNom()).append(t.getArrivee().getNom()).append(t.getModalite());
@@ -135,9 +159,74 @@ public class Plateforme {
             }
         }
         if (voyages.size() == 0) {
+            if (modes != null) {
+                throw new NoResultException();
+            }
             throw new AllResultFilteredException();
         }
         return voyages;
+    }
+
+    public List<Chemin> comparerPondere(Arret depart, Arret arrivee, int nombre, Set<ModaliteTransport> modes, double wTemps, double wCo2, double wPrix) throws NoResultException {
+        double maxTemps = 0, maxCo2 = 0, maxPrix = 0;
+        for (Connexion c : graphe.aretes()) {
+            Trajet t = (Trajet) c;
+            Cout cout = t.getCout();
+            maxTemps = Math.max(maxTemps, cout.getValeur(TypeCout.TEMPS));
+            maxCo2 = Math.max(maxCo2, cout.getValeur(TypeCout.CO2));
+            maxPrix = Math.max(maxPrix, cout.getValeur(TypeCout.PRIX));
+        }
+        if (maxTemps == 0) maxTemps = 1;
+        if (maxCo2 == 0) maxCo2 = 1;
+        if (maxPrix == 0) maxPrix = 1;
+        for (Connexion c : graphe.aretes()) {
+            Trajet t = (Trajet) c;
+            Cout cout = t.getCout();
+            double valeur = wTemps * (cout.getValeur(TypeCout.TEMPS) / maxTemps)
+                          + wCo2 * (cout.getValeur(TypeCout.CO2) / maxCo2)
+                          + wPrix * (cout.getValeur(TypeCout.PRIX) / maxPrix);
+            graphe.modifierPoidsArete(t, valeur);
+        }
+        List<Chemin> kpcc = AlgorithmeKPCC.kpcc(graphe, depart, arrivee, nombre);
+        if (kpcc.size() == 0) {
+            throw new NoResultException();
+        }
+        return kpcc;
+    }
+
+    public List<Voyage> comparerVoyagesPondere(Arret depart, Arret arrivee, int maxResultats, Set<ModaliteTransport> modes, double wTemps, double wCo2, double wPrix) throws NoResultException {
+        List<Chemin> chemins = comparerPondere(depart, arrivee, 4*maxResultats, modes, wTemps, wCo2, wPrix);
+        List<Voyage> voyages = new ArrayList<>();
+        HashSet<String> vus = new HashSet<>();
+        for (Chemin chemin : chemins) {
+            Voyage voyage = new Voyage(chemin);
+            if (respecteModes(voyage, modes)) {
+                StringBuilder sb = new StringBuilder();
+                for (Trajet t : voyage.getEtapes()) {
+                    sb.append(t.getDepart().getNom()).append(t.getArrivee().getNom()).append(t.getModalite());
+                }
+                if (vus.add(sb.toString())) {
+                    voyages.add(voyage);
+                    if (voyages.size() == maxResultats) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (voyages.size() == 0) {
+            throw new NoResultException();
+        }
+        return voyages;
+    }
+
+    private static boolean respecteModes(Voyage voyage, Set<ModaliteTransport> modes) {
+        if (modes == null || modes.isEmpty()) return true;
+        for (Trajet t : voyage.getEtapes()) {
+            if (t.getModalite() != null && !modes.contains(t.getModalite())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void trierVoyages(List<Voyage> voyages, TypeCout critere1, TypeCout critere2, TypeCout critere3) {
@@ -167,6 +256,20 @@ public class Plateforme {
         return true;
     }
 
+    public static void trierVoyagesMulticritere(List<Voyage> voyages, double poidsPrix, double poidsTemps, double poidsCO2) {
+        double total = poidsPrix + poidsTemps + poidsCO2;
+        if (total == 0) return;
+        voyages.sort((v1, v2) -> {
+            double s1 = v1.getCoutTotal(TypeCout.PRIX) * (poidsPrix / total)
+                      + v1.getCoutTotal(TypeCout.TEMPS) * (poidsTemps / total)
+                      + v1.getCoutTotal(TypeCout.CO2) * (poidsCO2 / total);
+            double s2 = v2.getCoutTotal(TypeCout.PRIX) * (poidsPrix / total)
+                      + v2.getCoutTotal(TypeCout.TEMPS) * (poidsTemps / total)
+                      + v2.getCoutTotal(TypeCout.CO2) * (poidsCO2 / total);
+            return Double.compare(s1, s2);
+        });
+    }
+
     public Arret enregistrerArret(String nom, ModaliteTransport modalite) {
         Arret arret = new Arret(nom.trim(), modalite);
         graphe.ajouterSommet(arret);
@@ -174,15 +277,21 @@ public class Plateforme {
     }
 
     public Arret creerArretVille(String nom, boolean arrive) {
-        Arret arret = enregistrerArret(nom, null);
+        for (Lieu lieu : graphe.sommets()) {
+            if (lieu instanceof Arret) {
+                Arret a = (Arret) lieu;
+                if (a.getNom().equals(nom.trim()) && a.getType() == null) {
+                    return a;
+                }
+            }
+        }
+        Arret arret = new Arret(nom.trim(), null);
+        graphe.ajouterSommet(arret);
         for (ModaliteTransport m : ModaliteTransport.values()) {
             Arret dest = getArret(nom, m);
             if (dest != null) {
-                if (arrive) {
-                    ajouterTrajet(new Trajet(dest, arret, null, new Cout(0, 0, 0)));
-                } else {
-                    ajouterTrajet(new Trajet(arret, dest, null, new Cout(0, 0, 0)));
-                }
+                ajouterTrajet(new Trajet(arret, dest, null, new Cout(0, 0, 0)));
+                ajouterTrajet(new Trajet(dest, arret, null, new Cout(0, 0, 0)));
             }
         }
         return arret;
